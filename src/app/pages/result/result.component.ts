@@ -16,7 +16,9 @@ export class ResultComponent implements OnInit {
 
   constructor(private router: Router) {}
 
-  ngOnInit() {
+  ngOnInit() {     
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     const resultData = sessionStorage.getItem('cleanResult');
     const statsData = sessionStorage.getItem('statsAvant');
     
@@ -44,28 +46,56 @@ export class ResultComponent implements OnInit {
     return this.result.statistiques_apres[key];
   }
 
-  getImprovement(key: string): string {
-    try {
-      const before = parseFloat(this.statsAvant[key]);
-      const after = parseFloat(this.result.statistiques_apres[key]);
-      
-      if (isNaN(before) || isNaN(after)) return 'N/A';
-      
-      const improvement = ((after - before) / before) * 100;
-      return `${improvement.toFixed(1)}%`;
-    } catch {
-      return 'N/A';
+getImprovement(key: string): string {
+  try {
+    const before = parseFloat(this.statsAvant[key]);
+    const after = parseFloat(this.result.statistiques_apres[key]);
+    
+    if (isNaN(before) || isNaN(after)) return '0.0%';
+    
+    if (before === after) return '0.0%';
+    
+    const decreaseIsBetter = [
+      'missing_values', 'missing_percentage', 'outliers', 
+      'duplicates', 'invalid_format', 'inconsistencies',
+      'Valeurs Manquantes', 'Valeurs Abberantes', 'Doublons'
+    ];
+    
+    let improvement: number;
+    
+    if (decreaseIsBetter.includes(key)) {
+      improvement = ((before - after) / before) * 100;
+    } else {
+      improvement = ((after - before) / before) * 100;
     }
+    
+    const absoluteImprovement = Math.abs(improvement);
+    
+    const rounded = Math.round(absoluteImprovement * 10) / 10;
+    
+    if (rounded === 0) return '0.0%';
+    
+    return `+${rounded.toFixed(1)}%`;
+    
+  } catch {
+    return '0.0%';
   }
+}
 
   isImprovement(key: string): boolean {
     try {
       const before = parseFloat(this.statsAvant[key]);
       const after = parseFloat(this.result.statistiques_apres[key]);
       
+      if (isNaN(before) || isNaN(after)) return false;
+      
+      if (before === after) return false;
+      
       const metricsWhereLowerIsBetter = [
         'missing_values', 'missing_percentage', 'outliers', 
-        'duplicates', 'invalid_format', 'inconsistencies'
+        'duplicates', 'invalid_format', 'inconsistencies',
+        'Valeurs Manquantes', 'Valeurs Abberantes', 'Doublons',
+        'Lignes', 'Colonnes' 
       ];
       
       if (metricsWhereLowerIsBetter.includes(key)) {
@@ -76,6 +106,17 @@ export class ResultComponent implements OnInit {
     } catch {
       return false;
     }
+  }
+
+  getImprovementCount(): number {
+    const keys = this.getKeys();
+    let count = 0;
+    for (const key of keys) {
+      if (this.isImprovement(key)) {
+        count++;
+      }
+    }
+    return count;
   }
 
   download() {

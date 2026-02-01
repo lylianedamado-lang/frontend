@@ -1,11 +1,10 @@
-<div class="data-clean-container">
+<div class="data-clean-container" id="top">
   <div class="header-section">
     <h1>Data Cleaning Platform</h1>
     <p class="subtitle">Importez vos données, nettoyez-les et obtenez des résultats optimisés</p>
   </div>
 
   <div class="main-content">
-    <!-- Section gauche : Upload -->
     <div class="upload-section">
       <div class="upload-card">
         <div class="upload-header">
@@ -58,7 +57,7 @@
       </div>
     </div>
 
-    <!-- Section droite : Statistiques avant -->
+    
     <div class="stats-section" *ngIf="statsAvant">
       <div class="stats-card">
         <div class="stats-header">
@@ -99,7 +98,7 @@
       </div>
     </div>
 
-    <!-- Placeholder quand pas de stats -->
+
     <div class="stats-placeholder" *ngIf="!statsAvant">
       <div class="placeholder-card">
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
@@ -107,11 +106,12 @@
           <path d="M22 12A10 10 0 0 0 12 2v10z"/>
         </svg>
         <h4>En attente de données</h4>
-<p>Importez un fichier (CSV, Excel, JSON, XML) pour voir les statistiques détaillées</p>      </div>
+        <p>Importez un fichier (CSV, Excel, JSON, XML) pour voir les statistiques de votre fichier avant nettoyage</p> 
+     </div>
     </div>
   </div>
 
-  <!-- Section Normalisation -->
+
   <div class="normalization-section" *ngIf="statsAvant">
     <div class="normalization-card">
       <div class="normalization-header">

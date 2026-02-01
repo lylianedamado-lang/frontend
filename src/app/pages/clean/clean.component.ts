@@ -83,6 +83,7 @@ export class CleanComponent {
   }
 
   launchClean() {
+
     if (!this.file) return;
 
     const normalize = this.normalizeChoice === 'yes';
@@ -107,8 +108,12 @@ export class CleanComponent {
 }
 
   goToResult() {
-    if (this.normalizeChoice && (this.normalizeChoice === 'no' || (this.normalizeChoice === 'yes' && this.method))) {
+  if (this.normalizeChoice && (this.normalizeChoice === 'no' || (this.normalizeChoice === 'yes' && this.method))) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    setTimeout(() => {
       this.router.navigate(['/result']);
-    }
+    }, 100);
   }
+}
 }
