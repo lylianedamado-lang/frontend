@@ -82,30 +82,40 @@ export class CleanComponent {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  launchClean() {
+ launchClean() {
+  if (!this.file) return;
 
-    if (!this.file) return;
-
-    const normalize = this.normalizeChoice === 'yes';
-
-    this.cleanService.cleanFile(this.file, normalize, this.method)
-      .subscribe({
-        next: (res) => {
-          sessionStorage.setItem('cleanResult', JSON.stringify(res));
-          this.statsAvant = res.statistiques_avant;
-          
-          sessionStorage.setItem('statsAvant', JSON.stringify(this.statsAvant));
-        },
-        error: (error) => {
-          console.error('Erreur lors du nettoyage:', error);
-        }
-      });
-  }
+  // Appel API SANS normalisation
+  this.cleanService.cleanFile(this.file, false, '')
+    .subscribe({
+      next: (res) => {
+        this.statsAvant = res.statistiques_avant;
+        sessionStorage.setItem('statsAvant', JSON.stringify(this.statsAvant));
+      },
+      error: (err) => console.error(err)
+    });
+}
 
   getStatsCount(): number {
   if (!this.statsAvant) return 0;
   return Object.keys(this.statsAvant).length;
 }
+
+applyNormalization() {
+  if (!this.file) return;
+
+  const normalize = this.normalizeChoice === 'yes';
+
+  this.cleanService.cleanFile(this.file, normalize, this.method)
+    .subscribe({
+      next: (res) => {
+        sessionStorage.setItem('cleanResult', JSON.stringify(res));
+        this.router.navigate(['/result']);
+      },
+      error: (err) => console.error(err)
+    });
+}
+
 
   goToResult() {
   if (this.normalizeChoice && (this.normalizeChoice === 'no' || (this.normalizeChoice === 'yes' && this.method))) {
