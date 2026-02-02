@@ -9,7 +9,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './clean.component.html',
-  styleUrls: ['./clean.component.css']
+  //styleUrls: ['./clean.component.css']
 })
 export class CleanComponent {
   file!: File;
