@@ -84,12 +84,10 @@ export class CleanComponent {
 
  launchClean() {
   if (!this.file) return;
-
-  // Appel API SANS normalisation
-  this.cleanService.cleanFile(this.file, false, '')
+  this.cleanService.analyzeFile(this.file)
     .subscribe({
       next: (res) => {
-        this.statsAvant = res.statistiques_avant;
+        this.statsAvant = { ...res.statistiques_avant };
         sessionStorage.setItem('statsAvant', JSON.stringify(this.statsAvant));
       },
       error: (err) => console.error(err)

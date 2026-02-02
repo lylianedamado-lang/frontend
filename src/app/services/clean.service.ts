@@ -23,7 +23,7 @@ export class CleanService {
 
     console.log(`Analyse du fichier: ${file.name} vers ${this.apiUrl}/clean`);
     
-    return this.http.post<any>(`${this.apiUrl}/clean`, formData)
+    return this.http.post<any>(`${this.apiUrl}/statavant`, formData)
       .pipe(
         catchError(this.handleError)
       );
