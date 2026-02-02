@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { CleanService } from '../../services/clean.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ViewChild, ElementRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-clean',
@@ -18,6 +20,7 @@ export class CleanComponent {
   statsAvant: any = null;
   isDragging = false;
   fileSize = '';
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private cleanService: CleanService,
@@ -60,6 +63,11 @@ export class CleanComponent {
   
   return validExtensions.some(ext => fileName.endsWith(ext));
 }
+ openFileSelector() {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.click();
+    }
+  }
  onFileChange(e: any) {
   if (e.target.files && e.target.files.length > 0) {
     const selectedFile = e.target.files[0];
