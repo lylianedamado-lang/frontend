@@ -1,15 +1,18 @@
 <div class="results-container">
   <!-- Ancre invisible pour le scroll -->
   <div id="top" style="position: absolute; top: 0;"></div>
-  
+
+  <!-- HEADER -->
   <div class="results-header">
     <div class="header-content">
-      <h1>✨ Résultats du nettoyage</h1>
-      <p class="subtitle">Vos données ont été nettoyées avec succès</p>
+      <h1>Résultats du preprocessing</h1>
+      <p class="subtitle">Vos données ont été prétraitées avec succès</p>
     </div>
     <div class="header-actions">
       <button class="back-btn" (click)="goBack()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m15 18-6-6 6-6"/>
         </svg>
         <span>Retour à l'analyse</span>
@@ -17,23 +20,16 @@
     </div>
   </div>
 
+  <!-- MAIN CONTENT -->
   <div class="results-main">
-    <!-- Section gauche : Statistiques -->
+
+    <!-- GAUCHE : STATISTIQUES -->
     <div class="stats-section">
       <div class="stats-card">
         <div class="card-header">
           <div class="header-title">
-            <h3>📈 Statistiques après nettoyage</h3>
-            <span class="status-badge success">Nettoyage terminé</span>
-          </div>
-          <div class="header-info">
-            <div class="info-item">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-              <span>Traitement réussi</span>
-            </div>
+            <h3>📈 Statistiques avant et après traitement</h3>
+            <span class="status-badge success">Traitement terminé</span>
           </div>
         </div>
 
@@ -45,24 +41,19 @@
                 <th>Avant</th>
                 <th>Après</th>
                 <th>Amélioration</th>
-
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let key of getKeys(); let i = index" [class.highlight]="i % 2 === 0">
-                <td class="metric-name">
-                  <span class="metric-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                      <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                  </span>
-                  {{ key }}
-                </td>
+              <tr *ngFor="let key of getKeys(); let i = index"
+                  [class.highlight]="i % 2 === 0">
+                <td class="metric-name">{{ key }}</td>
                 <td class="metric-before">{{ getBeforeValue(key) }}</td>
                 <td class="metric-after">{{ getAfterValue(key) }}</td>
                 <td class="metric-improvement">
-                  <span class="improvement-badge" [class.positive]="isImprovement(key)" [class.negative]="!isImprovement(key)">
+                  <span
+                    class="improvement-badge"
+                    [class.positive]="isImprovement(key)"
+                    [class.negative]="!isImprovement(key)">
                     {{ getImprovement(key) }}
                   </span>
                 </td>
@@ -73,52 +64,53 @@
       </div>
     </div>
 
-    <!-- Section droite : Téléchargement -->
+    <!-- DROITE : TELECHARGEMENT -->
     <div class="download-section">
-  <div class="download-card">
-    <div class="download-header">
-      <div class="download-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-      </div>
-      <h3>Télécharger les résultats</h3>
-      <p>Votre fichier nettoyé est prêt à être téléchargé</p>
-    </div>
-    
-    <div class="download-info">
-      <div class="info-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-        </svg>
-        <div class="info-content">
-          <span class="info-label">Nom du fichier</span>
-          <span class="info-value">{{ result?.fichier_nettoye || 'file_cleaned.csv' }}</span>
+      <div class="download-card">
+
+        <div class="download-header">
+          <div class="download-icon">
+            ⬇️
+          </div>
+          <h3>Télécharger le fichier final</h3>
+          <p>Résultat après preprocessing et nettoyage</p>
         </div>
-      </div>
-      
-      <div class="info-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <div class="info-content">
-          <span class="info-label">Statut</span>
-          <span class="info-value status-ready">Prêt au téléchargement</span>
+
+        <div class="download-info">
+
+          <div class="info-item">
+            <span class="info-label">Nom du fichier</span>
+            <span class="info-value">
+              {{ result?.fichier_sortie || '—' }}
+            </span>
+          </div>
+
+          <div class="info-item" *ngIf="result?.method">
+            <span class="info-label">Normalisation</span>
+            <span class="info-value">{{ result.method }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Statut</span>
+            <span class="info-value status-ready">Prêt au téléchargement</span>
+          </div>
+
         </div>
+
+        <button class="download-btn" (click)="download()">
+          Télécharger le fichier nettoyé
+        </button>
+
       </div>
     </div>
-    
-    <button class="download-btn" (click)="download()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/>
-        <line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      <span>Télécharger le fichier nettoyé</span>
-    </button>
+
   </div>
+
+  <!-- PARAGRAPHE EXPLICATIF EN BAS -->
+  <div class="api-summary">
+    <p>
+      Le fichier généré est prêt à être exploité pour l'analyse de données, la visualisation ou l'entraînement de modèles de machine learning.
+    </p>
+  </div>
+
 </div>

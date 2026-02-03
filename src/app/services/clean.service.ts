@@ -16,14 +16,14 @@ export class CleanService {
   analyzeFile(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('normalize', 'false'); 
+    formData.append('normalize', 'false');
     
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     formData.append('file_type', fileExtension || '');
 
     console.log(`Analyse du fichier: ${file.name} vers ${this.apiUrl}/clean`);
     
-    return this.http.post<any>(`${this.apiUrl}/statavant`, formData)
+    return this.http.post<any>(`${this.apiUrl}/clean`, formData)
       .pipe(
         catchError(this.handleError)
       );
