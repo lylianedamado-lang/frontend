@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
+import { CleanComponent } from './pages/clean/clean.component';
+import { ResultComponent } from './pages/result/result.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'clean', pathMatch: 'full' },
-  { path: 'clean', loadComponent: () => import('./pages/clean/clean.component').then(m => m.CleanComponent) },
-  { path: 'result', loadComponent: () => import('./pages/result/result.component').then(m => m.ResultComponent) },
-  { path: '**', redirectTo: 'clean' }
+  { path: '', component: CleanComponent },
+  { path: 'result', component: ResultComponent },
+  { path: '**', redirectTo: '' }
 ];

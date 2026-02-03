@@ -295,6 +295,7 @@
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  
 }
 
 .analyze-btn::before {
@@ -871,52 +872,4 @@
   background: var(--primary-color);
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.treatment-info {
-  margin-top: 1.5rem;
-}
-
-.info-card {
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 10px;
-  padding: 1.5rem;
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.info-card.normalized {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-}
-
-.info-icon {
-  flex-shrink: 0;
-}
-
-.info-icon svg {
-  color: #0ea5e9;
-}
-
-.info-card.normalized .info-icon svg {
-  color: #10b981;
-}
-
-.info-content h4 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  color: #0f172a;
-  font-size: 1.1rem;
-}
-
-.info-content p {
-  margin: 0;
-  color: #475569;
-  line-height: 1.6;
-}
-
-.info-content strong {
-  color: #0f172a;
 }

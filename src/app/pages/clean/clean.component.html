@@ -1,12 +1,7 @@
 <div class="data-clean-container" id="top">
   <div class="header-section">
     <h1>Data Cleaning Platform</h1>
-    <p class="subtitle">Importez vos données, nettoyez-les et obtenez des résultats optimisés</p>
-  </div>
-
-  <!-- Message d'erreur -->
-  <div class="error-message" *ngIf="errorMessage">
-    ⚠️ {{ errorMessage }}
+    <p class="subtitle">Prétraitement et nettoyage de données pour des résultats optimisés.</p>
   </div>
 
   <div class="main-content">
@@ -24,7 +19,7 @@
         </div>
         
         <div class="upload-area" [class.active]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
-          <input type="file" #fileInput (change)="onFileChange($event)" hidden accept=".csv,.xlsx,.xls,.json,.xml">
+          <input type="file" #fileInput (change)="onFileChange($event)" hidden accept=".csv,.xlsx,.xls,.json,.xml,.txt">
           <div class="upload-content">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -36,13 +31,12 @@
             <p class="upload-text">Glissez-déposez votre fichier ici</p>
             <p class="upload-subtext">ou</p>
             <button class="browse-btn" (click)="fileInput.click()">Parcourir les fichiers</button>
-            <p class="file-types">
-              <strong>Formats d'entrée supportés :</strong>
-              <span class="format-list">CSV, Excel (XLS/XLSX), JSON, XML</span>
-            </p>           
-          </div>
+              <p class="file-types">
+                <strong>Formats d'entrée supportés :</strong>
+                <span class="format-list">CSV, Excel (XLS/XLSX), JSON, XML</span>
+              </p>           
+      </div>
         </div>      
-        
         <div class="file-info" *ngIf="file">
           <div class="file-details">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -51,20 +45,19 @@
             </svg>
             <span>{{ file.name }}</span>
           </div>
-          <span class="file-size">{{ formatFileSize(file.size) }}</span>
+          <span class="file-size">{{ (file.size / 1024).toFixed(2) }} KB</span>
         </div>
         
-        <button class="analyze-btn" (click)="analyzeFile()" [disabled]="!file || isAnalyzing || isCleaning">
-          <span *ngIf="!isAnalyzing">Analyser le fichier</span>
-          <span *ngIf="isAnalyzing">Analyse en cours...</span>
-          <svg *ngIf="!isAnalyzing" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button"class="analyze-btn" (click)="launchClean()" [disabled]="!file" [class.disabled]="!file">
+          <span>Analyser le fichier</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>
         </button>
       </div>
     </div>
 
-    <!-- Section Statistiques Avant -->
+    
     <div class="stats-section" *ngIf="statsAvant">
       <div class="stats-card">
         <div class="stats-header">
@@ -81,12 +74,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let stat of statsArray">
+              <tr *ngFor="let s of statsAvant | keyvalue; let i = index" [class.highlight]="i % 2 === 0">
                 <td class="metric-name">
                   <span class="metric-dot"></span>
-                  {{ stat.key }}
+                  {{ s.key }}
                 </td>
-                <td class="metric-value">{{ stat.value }}</td>
+                <td class="metric-value">{{ s.value }}</td>
               </tr>
             </tbody>
           </table>
@@ -95,18 +88,17 @@
         <div class="stats-summary">
           <div class="summary-item">
             <span class="summary-label">Nombre de métriques</span>
-            <span class="summary-value">{{ statsArray.length }}</span>
+<span class="summary-value">{{ getStatsCount() }}</span>
           </div>
           <div class="summary-item">
             <span class="summary-label">Statut</span>
-            <span class="summary-status">Prêt pour nettoyage</span>
+            <span class="summary-status">Analysé</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Placeholder quand pas de stats -->
-    <div class="stats-placeholder" *ngIf="!statsAvant && !isAnalyzing">
+    <div class="stats-placeholder" *ngIf="!statsAvant">
       <div class="placeholder-card">
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
@@ -114,48 +106,46 @@
         </svg>
         <h4>En attente de données</h4>
         <p>Importez un fichier (CSV, Excel, JSON, XML) pour voir les statistiques de votre fichier avant nettoyage</p> 
-      </div>
+     </div>
     </div>
   </div>
 
-  <!-- Section Normalisation -->
+
   <div class="normalization-section" *ngIf="statsAvant">
     <div class="normalization-card">
       <div class="normalization-header">
-        <h3>⚙️ Options de traitement</h3>
-        <p>Choisissez comment traiter vos données avant le nettoyage</p>
+        <h3>⚙️ Options de normalisation</h3>
+        <p>Souhaitez-vous normaliser vos données avant le nettoyage ?</p>
       </div>
       
       <div class="normalization-options">
         <div class="option-group">
-          <div class="option-label">Normalisation des données :</div>
+          <div class="option-label">Normalisation :</div>
           <div class="radio-options">
             <label class="radio-label" [class.selected]="normalizeChoice === 'no'">
               <input type="radio" name="norm" value="no" [(ngModel)]="normalizeChoice">
               <span class="radio-custom"></span>
-              <span class="radio-text"><strong>Option 1:</strong> Nettoyage seul (sans normalisation)</span>
+              <span class="radio-text">Non, garder les données brutes</span>
             </label>
             
             <label class="radio-label" [class.selected]="normalizeChoice === 'yes'">
               <input type="radio" name="norm" value="yes" [(ngModel)]="normalizeChoice">
               <span class="radio-custom"></span>
-              <span class="radio-text"><strong>Option 2:</strong> Normalisation + Nettoyage</span>
+              <span class="radio-text">Oui, normaliser les données</span>
             </label>
           </div>
         </div>
 
-        <!-- Sélecteur de méthode si normalisation choisie -->
         <div class="method-selector" *ngIf="normalizeChoice === 'yes'">
           <div class="option-label">Méthode de normalisation :</div>
           <div class="method-options">
             <select [(ngModel)]="method" class="method-select">
               <option value="">Choisir une méthode</option>
-              <option value="minmax">Min-Max Scaling (mettre à l'échelle entre 0 et 1)</option>
-              <option value="zscore">Z-Score Standardization (centrer autour de 0)</option>
-              <option value="robust">Robust Scaling (résistant aux valeurs extrêmes)</option>
+              <option value="minmax">Min-Max Scaling (0 à 1)</option>
+              <option value="zscore">Z-Score Standardization</option>
+              <option value="robust">Robust Scaling (résistant aux outliers)</option>
             </select>
             
-            <!-- Description de la méthode -->
             <div class="method-info" *ngIf="method">
               <div class="info-header">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -163,45 +153,12 @@
                   <line x1="12" y1="16" x2="12" y2="12"/>
                   <line x1="12" y1="8" x2="12.01" y2="8"/>
                 </svg>
-                <span>À propos de cette méthode :</span>
+                <span>À propos de cette méthode</span>
               </div>
               <p class="info-text">
-                <strong *ngIf="method === 'minmax'">Min-Max Scaling :</strong>
-                <span *ngIf="method === 'minmax'">Transforme vos données numériques pour qu'elles soient comprises entre 0 et 1. Idéal pour les algorithmes sensibles à l'échelle.</span>
-                
-                <strong *ngIf="method === 'zscore'">Z-Score Standardization :</strong>
-                <span *ngIf="method === 'zscore'">Centre vos données autour de 0 avec un écart-type de 1. Parfait pour les analyses statistiques.</span>
-                
-                <strong *ngIf="method === 'robust'">Robust Scaling :</strong>
-                <span *ngIf="method === 'robust'">Utilise les quartiles pour réduire l'impact des valeurs extrêmes. Recommandé en présence d'outliers.</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Info sur le traitement choisi -->
-        <div class="treatment-info" *ngIf="normalizeChoice">
-          <div class="info-card" [class.normalized]="normalizeChoice === 'yes'">
-            <div class="info-icon">
-              <svg *ngIf="normalizeChoice === 'no'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <svg *ngIf="normalizeChoice === 'yes'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-                <path d="m9 12 2 2 4-4"></path>
-              </svg>
-            </div>
-            <div class="info-content">
-              <h4>Traitement sélectionné :</h4>
-              <p *ngIf="normalizeChoice === 'no'">
-                <strong>Nettoyage seul</strong> - Vos données seront nettoyées (valeurs manquantes, doublons, outliers) mais <strong>garderont leur échelle originale</strong>.
-              </p>
-              <p *ngIf="normalizeChoice === 'yes' && method">
-                <strong>Normalisation + Nettoyage</strong> - Vos données seront d'abord normalisées avec la méthode <strong>{{ getMethodName() }}</strong>, puis nettoyées.
-              </p>
-              <p *ngIf="normalizeChoice === 'yes' && !method">
-                <strong>Normalisation + Nettoyage</strong> - Veuillez sélectionner une méthode de normalisation.
+                <span *ngIf="method === 'minmax'">Met les données à l'échelle entre 0 et 1. Idéal lorsque les bornes sont connues.</span>
+                <span *ngIf="method === 'zscore'">Centre les données autour de 0 avec un écart-type de 1. Idéal pour les distributions normales.</span>
+                <span *ngIf="method === 'robust'">Utilise les quartiles pour réduire l'impact des valeurs extrêmes. Idéal en présence d'outliers.</span>
               </p>
             </div>
           </div>
@@ -209,26 +166,15 @@
       </div>
       
       <div class="action-section">
-        <button class="result-btn" (click)="launchClean()" [disabled]="!canLaunchClean() || isCleaning" [class.disabled]="!canLaunchClean() || isCleaning">
-          <span *ngIf="!isCleaning">
-            <span *ngIf="normalizeChoice === 'no'">Lancer le nettoyage</span>
-            <span *ngIf="normalizeChoice === 'yes'">Lancer la normalisation + nettoyage</span>
-          </span>
-          <span *ngIf="isCleaning">
-            <span *ngIf="normalizeChoice === 'no'">Nettoyage en cours...</span>
-            <span *ngIf="normalizeChoice === 'yes'">Normalisation + nettoyage en cours...</span>
-          </span>
-          <svg *ngIf="!isCleaning" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="result-btn"(click)="applyNormalization()"[disabled]="normalizeChoice === 'yes' && !method">
+
+          <span>Voir les résultats du nettoyage</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14"/>
             <path d="m12 5 7 7-7 7"/>
           </svg>
         </button>
-        <p class="action-hint" *ngIf="normalizeChoice === 'no'">
-          Le fichier sera nettoyé (valeurs manquantes, doublons, outliers) sans modification d'échelle
-        </p>
-        <p class="action-hint" *ngIf="normalizeChoice === 'yes'">
-          Le fichier sera d'abord normalisé avec {{ getMethodName() || 'la méthode sélectionnée' }}, puis nettoyé
-        </p>
+        <p class="action-hint">Vous serez redirigé vers la page des résultats</p>
       </div>
     </div>
   </div>

@@ -13,14 +13,11 @@ import { FormsModule } from '@angular/forms';
 })
 export class CleanComponent {
   file!: File;
-  normalizeChoice: 'yes' | 'no' = 'no';
+  normalizeChoice: 'yes' | 'no' | null = null;
   method = '';
   statsAvant: any = null;
   isDragging = false;
-  isAnalyzing = false;
-  isCleaning = false;
-  errorMessage = '';
-  statsArray: { key: string, value: any }[] = [];
+  fileSize = '';
 
   constructor(
     private cleanService: CleanService,
@@ -39,44 +36,43 @@ export class CleanComponent {
     this.isDragging = false;
   }
 
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
+ onDrop(event: DragEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+  this.isDragging = false;
+  
+  if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+    const droppedFile = event.dataTransfer.files[0];
     
-    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-      const droppedFile = event.dataTransfer.files[0];
-      this.handleFileSelection(droppedFile);
+    if (this.isValidFileType(droppedFile)) {
+      this.file = droppedFile;
+      this.fileSize = this.formatFileSize(this.file.size);
+    } else {
+      alert('Format de fichier non supporté. Veuillez utiliser CSV, Excel, JSON ou XML.');
     }
   }
+}
 
-  onFileChange(e: any) {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      this.handleFileSelection(selectedFile);
+
+  isValidFileType(file: File): boolean {
+  const validExtensions = ['.csv', '.xlsx', '.xls', 'Excel', '.json', '.xml'];
+  const fileName = file.name.toLowerCase();
+  
+  return validExtensions.some(ext => fileName.endsWith(ext));
+}
+ onFileChange(e: any) {
+  if (e.target.files && e.target.files.length > 0) {
+    const selectedFile = e.target.files[0];
+    
+    if (this.isValidFileType(selectedFile)) {
+      this.file = selectedFile;
+      this.fileSize = this.formatFileSize(this.file.size);
+    } else {
+      alert('Format de fichier non supporté. Veuillez utiliser CSV, Excel, JSON ou XML.');
+      e.target.value = '';
     }
   }
-
-  handleFileSelection(file: File) {
-    const allowedExtensions = ['.csv', '.xlsx', '.xls', '.json', '.xml'];
-    const fileName = file.name.toLowerCase();
-    
-    if (!allowedExtensions.some(ext => fileName.endsWith(ext))) {
-      this.errorMessage = 'Format de fichier non supporté. Veuillez utiliser CSV, Excel, JSON ou XML.';
-      return;
-    }
-    
-    this.file = file;
-    this.resetAnalysis();
-    this.errorMessage = '';
-  }
-
-  resetAnalysis() {
-    this.statsAvant = null;
-    this.statsArray = [];
-    this.normalizeChoice = 'no';
-    this.method = '';
-  }
+}
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
@@ -86,113 +82,46 @@ export class CleanComponent {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  analyzeFile() {
-    if (!this.file) {
-      this.errorMessage = 'Veuillez sélectionner un fichier d\'abord.';
-      return;
-    }
-    
-    this.isAnalyzing = true;
-    this.errorMessage = '';
-    
-    // Analyser SANS normalisation (juste pour voir les stats avant)
-    this.cleanService.cleanFile(this.file, false, '')
-      .subscribe({
-        next: (res) => {
-          this.statsAvant = res.statistiques_avant;
-          this.convertStatsToArray();
-          this.isAnalyzing = false;
-          console.log('Analyse réussie:', this.statsAvant);
-        },
-        error: (error) => {
-          console.error('Erreur lors de l\'analyse:', error);
-          this.errorMessage = 'Erreur lors de l\'analyse du fichier. Vérifiez que le backend est démarré.';
-          this.isAnalyzing = false;
-        }
-      });
-  }
+ launchClean() {
+  if (!this.file) return;
+  this.cleanService.analyzeFile(this.file)
+    .subscribe({
+      next: (res) => {
+        this.statsAvant = { ...res.statistiques_avant };
+        sessionStorage.setItem('statsAvant', JSON.stringify(this.statsAvant));
+      },
+      error: (err) => console.error(err)
+    });
+}
 
-  convertStatsToArray() {
-    if (!this.statsAvant) {
-      this.statsArray = [];
-      return;
-    }
-    
-    this.statsArray = Object.keys(this.statsAvant).map(key => ({
-      key: this.formatStatKey(key),
-      value: this.statsAvant[key]
-    }));
-  }
+  getStatsCount(): number {
+  if (!this.statsAvant) return 0;
+  return Object.keys(this.statsAvant).length;
+}
 
-  formatStatKey(key: string): string {
-    const keyMap: {[key: string]: string} = {
-      'Lignes': 'Nombre de lignes',
-      'Colonnes': 'Nombre de colonnes',
-      'Valeurs Manquantes': 'Valeurs manquantes',
-      'Valeurs Abberantes': 'Valeurs aberrantes',
-      'Doublons': 'Nombre de doublons',
-      'Colonnes Numeriques': 'Colonnes numériques',
-      'Colonnes textes': 'Colonnes texte'
-    };
-    
-    return keyMap[key] || key;
-  }
+applyNormalization() {
+  if (!this.file) return;
 
-  getMethodName(): string {
-    const methodNames: {[key: string]: string} = {
-      'minmax': 'Min-Max Scaling',
-      'zscore': 'Z-Score Standardization',
-      'robust': 'Robust Scaling'
-    };
-    
-    return methodNames[this.method] || this.method;
-  }
+  const normalize = this.normalizeChoice === 'yes';
 
-  canLaunchClean(): boolean {
-    if (!this.file) return false;
-    if (this.normalizeChoice === 'yes' && !this.method) return false;
-    return true;
-  }
+  this.cleanService.cleanFile(this.file, normalize, this.method)
+    .subscribe({
+      next: (res) => {
+        sessionStorage.setItem('cleanResult', JSON.stringify(res));
+        this.router.navigate(['/result']);
+      },
+      error: (err) => console.error(err)
+    });
+}
 
-  launchClean() {
-    if (!this.canLaunchClean()) {
-      if (this.normalizeChoice === 'yes' && !this.method) {
-        this.errorMessage = 'Veuillez sélectionner une méthode de normalisation.';
-      }
-      return;
-    }
-    
-    this.isCleaning = true;
-    this.errorMessage = '';
+
+  goToResult() {
+  if (this.normalizeChoice && (this.normalizeChoice === 'no' || (this.normalizeChoice === 'yes' && this.method))) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    const normalize = this.normalizeChoice === 'yes';
-    
-    this.cleanService.cleanFile(this.file, normalize, this.method)
-      .subscribe({
-        next: (res) => {
-          // Stocker TOUTES les données dans sessionStorage
-          sessionStorage.setItem('cleanResult', JSON.stringify(res));
-          sessionStorage.setItem('statsAvant', JSON.stringify(res.statistiques_avant));
-          sessionStorage.setItem('statsApres', JSON.stringify(res.statistiques_apres));
-          sessionStorage.setItem('downloadUrl', res.download_url);
-          sessionStorage.setItem('fileName', res.fichier_sortie);
-          sessionStorage.setItem('normalizationApplied', normalize.toString());
-          sessionStorage.setItem('normalizationMethod', this.method);
-          
-          console.log('Nettoyage terminé, redirection vers les résultats');
-          
-          // Naviguer vers la page de résultats
-          setTimeout(() => {
-            this.router.navigate(['/result']);
-            this.isCleaning = false;
-          }, 300);
-        },
-        error: (error) => {
-          console.error('Erreur lors du nettoyage:', error);
-          this.errorMessage = error.message || 'Erreur lors du traitement du fichier';
-          this.isCleaning = false;
-        }
-      });
+    setTimeout(() => {
+      this.router.navigate(['/result']);
+    }, 100);
   }
+}
 }
