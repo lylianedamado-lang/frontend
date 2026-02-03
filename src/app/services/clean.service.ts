@@ -21,9 +21,9 @@ export class CleanService {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     formData.append('file_type', fileExtension || '');
 
-    console.log(`Analyse du fichier: ${file.name} vers ${this.apiUrl}/clean`);
+    console.log(`Analyse du fichier: ${file.name} vers ${this.apiUrl}/statavant`);
     
-    return this.http.post<any>(`${this.apiUrl}/clean`, formData)
+    return this.http.post<any>(`${this.apiUrl}/statavant`, formData)
       .pipe(
         catchError(this.handleError)
       );
