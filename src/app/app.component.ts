@@ -1,16 +1,25 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { CleanComponent } from './pages/clean/clean.component';
-import { RouterLink } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FormsModule, CleanComponent, RouterLink],
+  imports: [CommonModule, RouterModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Data Cleaning Platform';
+
+  constructor(
+    public authService: AuthService,
+    private router: Router
+  ) {}
+
+  logout() {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
+  }
 }

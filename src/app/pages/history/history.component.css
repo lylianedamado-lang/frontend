@@ -1,0 +1,63 @@
+.history-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.history-header {
+  margin-bottom: 2rem;
+}
+
+.history-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #4361ee, #3a0ca3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.history-header p {
+  color: #6c757d;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-card {
+  background: white;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.history-card:hover {
+  transform: translateY(-3px);
+}
+
+.file-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.file-date {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.loading {
+  color: #4361ee;
+  font-weight: 500;
+}
+
+.error {
+  color: #ef476f;
+}
+
+.empty {
+  color: #6c757d;
+  font-style: italic;
+}
