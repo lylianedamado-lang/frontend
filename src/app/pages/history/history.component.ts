@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { finalize } from 'rxjs';
 
 import { HistoryItem, HistoryResponse, HistoryService } from '../../services/history.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-history',
@@ -57,36 +57,25 @@ export class HistoryComponent implements OnInit {
   download(item: HistoryItem): void {
     const resolvedUrl = this.resolveDownloadUrl(item);
     if (!resolvedUrl) {
-      this.downloadError = 'Ce fichier ne peut pas etre retelecharge pour le moment.';
+      this.downloadError = 'Ce fichier ne peut pas être retéléchargé pour le moment.';
       return;
     }
 
     this.downloadError = '';
     this.downloadingFile = this.getItemKey(item);
 
-    this.historyService.downloadFromHistory(resolvedUrl).pipe(
-      finalize(() => {
-        this.downloadingFile = '';
-      })
-    ).subscribe({
-      next: (blob) => {
-        try {
-          const objectUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = objectUrl;
-          a.download = item.cleaned_filename || item.fichier_sortie || item.original_filename || 'fichier_nettoye';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-        } catch {
-          this.downloadError = 'Telechargement impossible. Veuillez reessayer.';
-        }
-      },
-      error: (_err: HttpErrorResponse) => {
-        this.downloadError = 'Telechargement impossible. Veuillez reessayer.';
-      }
-    });
+    const absoluteUrl = this.toAbsoluteUrl(resolvedUrl);
+    const a = document.createElement('a');
+    a.href = absoluteUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => {
+      this.downloadingFile = '';
+    }, 1200);
   }
 
   isDownloadAvailable(item: HistoryItem): boolean {
@@ -108,11 +97,23 @@ export class HistoryComponent implements OnInit {
       return directUrl;
     }
 
-    if (!item.file_id) {
+    if (item.file_id) {
+      return `/download/${encodeURIComponent(item.file_id)}`;
+    }
+
+    const filename = item.cleaned_filename || item.fichier_sortie || item.original_filename;
+    if (!filename) {
       return null;
     }
 
-    return `/download/${encodeURIComponent(item.file_id)}`;
+    return `/download/${encodeURIComponent(filename)}`;
+  }
+
+  private toAbsoluteUrl(downloadUrl: string): string {
+    if (/^https?:\/\//i.test(downloadUrl)) {
+      return downloadUrl;
+    }
+    return `${environment.apiUrl}${downloadUrl.startsWith('/') ? '' : '/'}${downloadUrl}`;
   }
 
 }

@@ -35,12 +35,8 @@ export class HistoryService {
   }
 
   downloadFromHistory(downloadUrl: string) {
-    const requestUrl = /^https?:\/\//i.test(downloadUrl)
-      ? downloadUrl
-      : `${environment.apiUrl}${downloadUrl.startsWith('/') ? '' : '/'}${downloadUrl}`;
-
     return this.http.get(
-      requestUrl,
+      `${environment.apiUrl}${downloadUrl}`,
       {
         responseType: 'blob',
         withCredentials: true
