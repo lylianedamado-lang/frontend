@@ -97,17 +97,10 @@ export class AuthService {
     ).pipe(
       retry({ count: 1, delay: 250 }),
       map(res => {
-        // Evite qu'une réponse tardive n'écrase un état déjà connecté.
-        if (!res.user && this.currentUserSubject.value) {
-          return true;
-        }
         this.persistUser(res.user);
         return !!res.user;
       }),
       catchError(() => {
-        if (this.currentUserSubject.value) {
-          return of(true);
-        }
         this.persistUser(null);
         return of(false);
       }),

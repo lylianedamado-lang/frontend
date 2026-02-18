@@ -90,12 +90,7 @@ export class CleanComponent implements OnDestroy {
   }
 
   launchClean() {
-    if (!this.file) return;
-
-    if (this.analyzeSub) {
-      this.analyzeSub.unsubscribe();
-      this.analyzeSub = null;
-    }
+    if (!this.file || this.isAnalyzing) return;
 
     this.isAnalyzing = true;
     this.analyzeError = '';

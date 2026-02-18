@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject, map, retry, tap, timeout } from 'rxjs';
+import { BehaviorSubject, map, retry, tap } from 'rxjs';
 
 export interface HistoryItem {
+  file_id?: string;
   original_filename: string;
   cleaned_at: string;
   download_url?: string;
@@ -39,7 +40,6 @@ export class HistoryService {
       `${environment.apiUrl}/history`,
       { withCredentials: true }
     ).pipe(
-      timeout(8000),
       retry({ count: 1, delay: 450 }),
       map((response) => {
         if (Array.isArray(response)) {

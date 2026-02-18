@@ -114,6 +114,10 @@ export class HistoryComponent implements OnInit {
       return directUrl;
     }
 
+    if (item.file_id) {
+      return `/download/${encodeURIComponent(item.file_id)}`;
+    }
+
     const filename = item.cleaned_filename || item.fichier_sortie || item.original_filename;
     if (!filename) {
       return null;
