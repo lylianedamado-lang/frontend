@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CleanService, StatsMap } from '../../services/clean.service';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -46,10 +47,10 @@ export class CleanComponent {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
-    
+
     if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
       const droppedFile = event.dataTransfer.files[0];
-      
+
       if (this.isValidFileType(droppedFile)) {
         this.file = droppedFile;
         this.fileSize = this.formatFileSize(this.file.size);
@@ -59,7 +60,7 @@ export class CleanComponent {
         this.setPageMessage('', 'info');
         this.clearNormalizationError();
       } else {
-        this.setPageMessage('Format non supporté. Utilisez CSV, Excel, JSON ou XML.', 'error');
+        this.setPageMessage('Format non supporte. Utilisez CSV, Excel, JSON ou XML.', 'error');
       }
     }
   }
@@ -75,7 +76,7 @@ export class CleanComponent {
 
     if (input.files && input.files.length > 0) {
       const selectedFile = input.files[0];
-      
+
       if (this.isValidFileType(selectedFile)) {
         this.file = selectedFile;
         this.fileSize = this.formatFileSize(this.file.size);
@@ -85,7 +86,7 @@ export class CleanComponent {
         this.setPageMessage('', 'info');
         this.clearNormalizationError();
       } else {
-        this.setPageMessage('Format non supporté. Utilisez CSV, Excel, JSON ou XML.', 'error');
+        this.setPageMessage('Format non supporte. Utilisez CSV, Excel, JSON ou XML.', 'error');
         input.value = '';
       }
     }
@@ -119,20 +120,24 @@ export class CleanComponent {
   }
 
   private runAnalyze() {
-    this.cleanService.analyzeFile(this.file)
-      .subscribe({
-        next: (res) => {
-          this.statsAvant = { ...(res.statistiques_avant || {}) };
-          sessionStorage.setItem('statsAvant', JSON.stringify(this.statsAvant));
-          this.pageMessage = '';
-          this.clearNormalizationError();
-        },
-        error: (err) => {
-          console.error('Erreur analyse:', err);
-          this.pageMessage = err?.error?.error || 'Impossible d’analyser le fichier pour le moment.';
-          this.pageMessageType = 'error';
-        }
-      });
+    this.cleanService.analyzeFile(this.file).subscribe({
+      next: (res) => {
+        this.statsAvant = { ...(res.statistiques_avant || {}) };
+        sessionStorage.setItem('statsAvant', JSON.stringify(this.statsAvant));
+        this.pageMessage = '';
+        this.clearNormalizationError();
+      },
+      error: (err: HttpErrorResponse) => {
+        console.error('Erreur analyse:', {
+          status: err.status,
+          statusText: err.statusText,
+          url: err.url,
+          error: err.error
+        });
+        this.pageMessage = this.extractApiErrorMessage(err, 'Impossible d analyser le fichier pour le moment.');
+        this.pageMessageType = 'error';
+      }
+    });
   }
 
   getStatsCount(): number {
@@ -142,16 +147,16 @@ export class CleanComponent {
 
   applyNormalization() {
     this.clearNormalizationError();
-    
+
     if (this.normalizeChoice === null) {
-      this.normalizationError = 'Veuillez choisir si vous voulez normaliser les données.';
+      this.normalizationError = 'Veuillez choisir si vous voulez normaliser les donnees.';
       this.setPageMessage('Choisissez une option de normalisation pour continuer.', 'error');
       return;
     }
-    
+
     if (this.normalizeChoice === 'yes' && !this.method) {
-      this.normalizationError = 'Veuillez choisir une méthode de normalisation avant de continuer.';
-      this.setPageMessage('Sélectionnez une méthode de normalisation.', 'error');
+      this.normalizationError = 'Veuillez choisir une methode de normalisation avant de continuer.';
+      this.setPageMessage('Selectionnez une methode de normalisation.', 'error');
       return;
     }
 
@@ -165,22 +170,21 @@ export class CleanComponent {
 
     const normalize = this.normalizeChoice === 'yes';
     this.isCleaning = true;
-    this.setPageMessage('Nettoyage en cours... vous serez redirigé vers les résultats.', 'info');
+    this.setPageMessage('Nettoyage en cours... vous serez redirige vers les resultats.', 'info');
 
-    this.cleanService.cleanFile(this.file, normalize, this.method)
-      .subscribe({
-        next: (res) => {
-          sessionStorage.setItem('cleanResult', JSON.stringify(res));
-          this.isCleaning = false;
-          this.setPageMessage('Nettoyage terminé. Redirection vers la page Résultats...', 'success');
-          this.router.navigate(['/result']);
-        },
-        error: (err) => {
-          this.isCleaning = false;
-          this.normalizationError = err?.error?.error || 'Erreur lors du nettoyage. Veuillez réessayer.';
-          this.setPageMessage(this.normalizationError, 'error');
-        }
-      });
+    this.cleanService.cleanFile(this.file, normalize, this.method).subscribe({
+      next: (res) => {
+        sessionStorage.setItem('cleanResult', JSON.stringify(res));
+        this.isCleaning = false;
+        this.setPageMessage('Nettoyage termine. Redirection vers la page Resultats...', 'success');
+        this.router.navigate(['/result']);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isCleaning = false;
+        this.normalizationError = this.extractApiErrorMessage(err, 'Erreur lors du nettoyage. Veuillez reessayer.');
+        this.setPageMessage(this.normalizationError, 'error');
+      }
+    });
   }
 
   onMethodChange() {
@@ -199,5 +203,26 @@ export class CleanComponent {
   ): void {
     this.pageMessage = message;
     this.pageMessageType = type;
+  }
+
+  private extractApiErrorMessage(err: HttpErrorResponse, fallback: string): string {
+    if (err.status === 0) {
+      return 'Connexion API impossible (CORS/reseau). Verifiez backend et configuration CORS.';
+    }
+
+    const payload = err.error;
+
+    if (typeof payload === 'string' && payload.trim()) {
+      return payload;
+    }
+
+    if (payload && typeof payload === 'object') {
+      const apiError = payload.error || payload.message || payload.detail;
+      if (typeof apiError === 'string' && apiError.trim()) {
+        return apiError;
+      }
+    }
+
+    return `${fallback} (HTTP ${err.status})`;
   }
 }
