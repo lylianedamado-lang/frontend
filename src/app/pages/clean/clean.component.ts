@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CleanService, StatsMap } from '../../services/clean.service';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -25,6 +26,7 @@ export class CleanComponent {
 
   constructor(
     private cleanService: CleanService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -99,6 +101,24 @@ export class CleanComponent {
 
   launchClean() {
     if (!this.file) return;
+
+    if (this.authService.isAuthenticated()) {
+      this.runAnalyze();
+      return;
+    }
+
+    this.authService.checkSession().subscribe((isAuthenticated) => {
+      if (!isAuthenticated) {
+        this.setPageMessage('Veuillez vous connecter pour analyser un fichier.', 'error');
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      this.runAnalyze();
+    });
+  }
+
+  private runAnalyze() {
     this.cleanService.analyzeFile(this.file)
       .subscribe({
         next: (res) => {

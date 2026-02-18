@@ -22,8 +22,6 @@ export interface HistoryResponse {
   providedIn: 'root'
 })
 export class HistoryService {
-  
-
   constructor(private http: HttpClient) {}
 
   getHistory() {
@@ -36,12 +34,24 @@ export class HistoryService {
   }
 
   downloadFromHistory(downloadUrl: string) {
+    const requestUrl = this.buildDownloadUrl(downloadUrl);
+
     return this.http.get(
-      `${environment.apiUrl}${downloadUrl}`,
+      requestUrl,
       {
         responseType: 'blob',
         withCredentials: true
       }
     );
+  }
+
+  private buildDownloadUrl(downloadUrl: string): string {
+    if (/^https?:\/\//i.test(downloadUrl)) {
+      return downloadUrl;
+    }
+
+    const apiBase = environment.apiUrl.replace(/\/+$/, '');
+    const normalizedPath = downloadUrl.startsWith('/') ? downloadUrl : `/${downloadUrl}`;
+    return `${apiBase}${normalizedPath}`;
   }
 }
