@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { retry } from 'rxjs';
 
 export interface HistoryItem {
+  file_id?: string;
   original_filename: string;
   cleaned_at: string;
   download_url?: string;
@@ -34,7 +35,9 @@ export class HistoryService {
   }
 
   downloadFromHistory(downloadUrl: string) {
-    const requestUrl = this.buildDownloadUrl(downloadUrl);
+    const requestUrl = /^https?:\/\//i.test(downloadUrl)
+      ? downloadUrl
+      : `${environment.apiUrl}${downloadUrl.startsWith('/') ? '' : '/'}${downloadUrl}`;
 
     return this.http.get(
       requestUrl,
@@ -43,15 +46,5 @@ export class HistoryService {
         withCredentials: true
       }
     );
-  }
-
-  private buildDownloadUrl(downloadUrl: string): string {
-    if (/^https?:\/\//i.test(downloadUrl)) {
-      return downloadUrl;
-    }
-
-    const apiBase = environment.apiUrl.replace(/\/+$/, '');
-    const normalizedPath = downloadUrl.startsWith('/') ? downloadUrl : `/${downloadUrl}`;
-    return `${apiBase}${normalizedPath}`;
   }
 }
