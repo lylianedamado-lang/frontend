@@ -363,6 +363,7 @@
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .analyze-btn::before {
@@ -841,6 +842,7 @@
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .result-btn::before {
@@ -1037,4 +1039,24 @@
 .result-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .analyze-btn:hover:not(.disabled) {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .analyze-btn:hover:not(.disabled)::before {
+    left: -100%;
+  }
+
+  .result-btn:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .result-btn:hover::before {
+    left: -100%;
+  }
 }

@@ -95,6 +95,7 @@ body {
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .nav-links a::before {
@@ -165,6 +166,7 @@ body {
   transition: var(--transition);
   padding: 0.5rem;
   border-radius: 6px;
+  touch-action: manipulation;
 }
 
 .footer-links a:hover {
@@ -254,5 +256,22 @@ body {
   
   .container {
     padding: 0 1rem;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .nav-links a:hover {
+    color: var(--gray-dark);
+    transform: none;
+    box-shadow: none;
+  }
+
+  .nav-links a:hover::before {
+    opacity: 0;
+  }
+
+  .footer-links a:hover {
+    color: var(--gray-medium);
+    background: transparent;
   }
 }
