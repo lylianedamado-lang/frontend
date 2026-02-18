@@ -108,16 +108,7 @@ body {
   opacity: 0;
   transition: var(--transition);
   border-radius: 50px;
-}
-
-.nav-links a:hover {
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: var(--box-shadow);
-}
-
-.nav-links a:hover::before {
-  opacity: 1;
+  pointer-events: none;
 }
 
 .nav-links a.active {
@@ -129,6 +120,18 @@ body {
 .nav-links a span {
   position: relative;
   z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-links a:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+  }
+
+  .nav-links a:hover::before {
+    opacity: 1;
+  }
 }
 
 /* ===== MAIN ===== */

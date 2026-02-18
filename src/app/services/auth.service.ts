@@ -27,11 +27,15 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
+  // Nouveau subject pour indiquer si la session est en cours de chargement
+  private loadingSubject = new BehaviorSubject<boolean>(true);
+  loading$ = this.loadingSubject.asObservable();
+
   constructor(private http: HttpClient) {
     const cachedUser = sessionStorage.getItem('currentUser');
     if (cachedUser) {
       try {
-        this.currentUserSubject.next(JSON.parse(cachedUser) as AuthUser);
+        this.persistUser(JSON.parse(cachedUser) as AuthUser);
       } catch {
         sessionStorage.removeItem('currentUser');
       }
@@ -47,12 +51,7 @@ export class AuthService {
       { withCredentials: true }
     ).pipe(
       tap(res => {
-        this.currentUserSubject.next(res.user);
-        if (res.user) {
-          sessionStorage.setItem('currentUser', JSON.stringify(res.user));
-        } else {
-          sessionStorage.removeItem('currentUser');
-        }
+        this.persistUser(res.user);
       })
     );
   }
@@ -74,15 +73,17 @@ export class AuthService {
       { withCredentials: true }
     ).pipe(
       tap(() => {
-        this.currentUserSubject.next(null);
-        sessionStorage.removeItem('currentUser');
+        this.persistUser(null);
       })
     );
   }
 
   // 🔍 CHECK SESSION
   loadUser() {
-    this.checkSession().subscribe();
+    this.checkSession().subscribe({
+      next: () => this.loadingSubject.next(false),
+      error: () => this.loadingSubject.next(false)
+    });
   }
 
   checkSession() {
@@ -96,20 +97,18 @@ export class AuthService {
     ).pipe(
       retry({ count: 1, delay: 250 }),
       map(res => {
-        this.currentUserSubject.next(res.user);
-        if (res.user) {
-          sessionStorage.setItem('currentUser', JSON.stringify(res.user));
-        } else {
-          sessionStorage.removeItem('currentUser');
+        // Evite qu'une réponse tardive n'écrase un état déjà connecté.
+        if (!res.user && this.currentUserSubject.value) {
+          return true;
         }
+        this.persistUser(res.user);
         return !!res.user;
       }),
       catchError(() => {
         if (this.currentUserSubject.value) {
           return of(true);
         }
-        this.currentUserSubject.next(null);
-        sessionStorage.removeItem('currentUser');
+        this.persistUser(null);
         return of(false);
       }),
       finalize(() => {
@@ -122,8 +121,21 @@ export class AuthService {
     return request$;
   }
 
-  // ✅ AUTH CHECK
+  // ✅ AUTH CHECK (synchrone)
   isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
+  }
+
+  isLoading(): boolean {
+    return this.loadingSubject.value;
+  }
+
+  private persistUser(user: AuthUser | null): void {
+    this.currentUserSubject.next(user);
+    if (user) {
+      sessionStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem('currentUser');
+    }
   }
 }

@@ -27,8 +27,8 @@
       
       <ng-container *ngIf="authService.currentUser$ | async as user">
       
-        <a routerLink="/clean">Nettoyage</a>
-        <a routerLink="/history">Historique</a>
+        <button type="button" class="nav-link-btn" (click)="goTo('/clean')">Nettoyage</button>
+        <button type="button" class="nav-link-btn" (click)="goTo('/history')">Historique</button>
         <button class="logout-btn" (click)="logout()">Déconnexion</button>
       </ng-container>
 

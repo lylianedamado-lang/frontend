@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CleanService, StatsMap } from '../../services/clean.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-clean',
@@ -11,7 +12,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './clean.component.html',
   styleUrls: ['./clean.component.css']
 })
-export class CleanComponent {
+export class CleanComponent implements OnDestroy {
   file!: File;
   normalizeChoice: 'yes' | 'no' | null = null;
   method = '';
@@ -19,9 +20,12 @@ export class CleanComponent {
   isDragging = false;
   fileSize = '';
   normalizationError = '';
+  analyzeError = '';
+  isAnalyzing = false;
   isCleaning = false;
   pageMessage = '';
   pageMessageType: 'info' | 'success' | 'error' = 'info';
+  private analyzeSub: Subscription | null = null;
 
   constructor(
     private cleanService: CleanService,
@@ -49,13 +53,7 @@ export class CleanComponent {
       const droppedFile = event.dataTransfer.files[0];
       
       if (this.isValidFileType(droppedFile)) {
-        this.file = droppedFile;
-        this.fileSize = this.formatFileSize(this.file.size);
-        this.statsAvant = null;
-        this.method = '';
-        this.normalizeChoice = null;
-        this.setPageMessage('', 'info');
-        this.clearNormalizationError();
+        this.prepareFile(droppedFile);
       } else {
         this.setPageMessage('Format non supporté. Utilisez CSV, Excel, JSON ou XML.', 'error');
       }
@@ -75,13 +73,7 @@ export class CleanComponent {
       const selectedFile = input.files[0];
       
       if (this.isValidFileType(selectedFile)) {
-        this.file = selectedFile;
-        this.fileSize = this.formatFileSize(this.file.size);
-        this.statsAvant = null;
-        this.method = '';
-        this.normalizeChoice = null;
-        this.setPageMessage('', 'info');
-        this.clearNormalizationError();
+        this.prepareFile(selectedFile);
       } else {
         this.setPageMessage('Format non supporté. Utilisez CSV, Excel, JSON ou XML.', 'error');
         input.value = '';
@@ -99,7 +91,22 @@ export class CleanComponent {
 
   launchClean() {
     if (!this.file) return;
-    this.cleanService.analyzeFile(this.file)
+
+    if (this.analyzeSub) {
+      this.analyzeSub.unsubscribe();
+      this.analyzeSub = null;
+    }
+
+    this.isAnalyzing = true;
+    this.analyzeError = '';
+
+    this.analyzeSub = this.cleanService.analyzeFile(this.file)
+      .pipe(
+        finalize(() => {
+          this.isAnalyzing = false;
+          this.analyzeSub = null;
+        })
+      )
       .subscribe({
         next: (res) => {
           this.statsAvant = { ...(res.statistiques_avant || {}) };
@@ -109,10 +116,16 @@ export class CleanComponent {
         },
         error: (err) => {
           console.error('Erreur analyse:', err);
-          this.pageMessage = err?.error?.error || 'Impossible d’analyser le fichier pour le moment.';
-          this.pageMessageType = 'error';
+          this.analyzeError = err?.error?.error || 'Impossible d’analyser le fichier pour le moment.';
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    if (this.analyzeSub) {
+      this.analyzeSub.unsubscribe();
+      this.analyzeSub = null;
+    }
   }
 
   getStatsCount(): number {
@@ -124,14 +137,14 @@ export class CleanComponent {
     this.clearNormalizationError();
     
     if (this.normalizeChoice === null) {
-      this.normalizationError = 'Veuillez choisir si vous voulez normaliser les données.';
-      this.setPageMessage('Choisissez une option de normalisation pour continuer.', 'error');
+      this.normalizationError = 'Veuillez choisir si vous voulez normaliser les données ou non.';
+      this.setPageMessage('', 'info');
       return;
     }
     
     if (this.normalizeChoice === 'yes' && !this.method) {
-      this.normalizationError = 'Veuillez choisir une méthode de normalisation avant de continuer.';
-      this.setPageMessage('Sélectionnez une méthode de normalisation.', 'error');
+      this.normalizationError = ' Choisir une méthode de normalisation pour continuer.';
+      this.setPageMessage('', 'info');
       return;
     }
 
@@ -158,7 +171,7 @@ export class CleanComponent {
         error: (err) => {
           this.isCleaning = false;
           this.normalizationError = err?.error?.error || 'Erreur lors du nettoyage. Veuillez réessayer.';
-          this.setPageMessage(this.normalizationError, 'error');
+          this.setPageMessage('', 'info');
         }
       });
   }
@@ -179,5 +192,21 @@ export class CleanComponent {
   ): void {
     this.pageMessage = message;
     this.pageMessageType = type;
+  }
+
+  private prepareFile(file: File): void {
+    if (this.analyzeSub) {
+      this.analyzeSub.unsubscribe();
+      this.analyzeSub = null;
+    }
+    this.isAnalyzing = false;
+    this.file = file;
+    this.fileSize = this.formatFileSize(this.file.size);
+    this.statsAvant = null;
+    this.method = '';
+    this.normalizeChoice = null;
+    this.setPageMessage('', 'info');
+    this.analyzeError = '';
+    this.clearNormalizationError();
   }
 }

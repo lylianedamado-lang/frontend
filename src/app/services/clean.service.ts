@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 
 export type StatsMap = Record<string, number | string | null>;
 
@@ -34,6 +34,8 @@ export class CleanService {
       `${this.apiUrl}/statavant`,
       formData,
       { withCredentials: true }
+    ).pipe(
+      timeout(12000)
     );
   }
 

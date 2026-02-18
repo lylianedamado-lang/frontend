@@ -5,6 +5,8 @@
     <p>La liste des fichiers que vous avez traités sera affichée ici</p>
   </div>
 
+  <div *ngIf="loading && history.length === 0" class="history-loading" aria-label="Chargement de l'historique"></div>
+
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
   </div>

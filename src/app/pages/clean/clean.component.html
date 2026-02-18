@@ -66,12 +66,27 @@
           <span class="file-size">{{ fileSize }}</span>
         </div>
         
-        <button type="button" class="analyze-btn" (click)="launchClean()" [disabled]="!file" [class.disabled]="!file">
+        <button
+          type="button"
+          class="analyze-btn"
+          (click)="launchClean()"
+          [disabled]="!file"
+          [class.disabled]="!file"
+        >
           <span>Analyser le fichier</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>
         </button>
+
+        <div *ngIf="analyzeError" class="error-message analyze-error">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {{ analyzeError }}
+        </div>
       </div>
     </div>
 
@@ -131,6 +146,15 @@
         <h3>⚙️ Options de normalisation</h3>
         <p>Souhaitez-vous normaliser vos données après le nettoyage ?</p>
       </div>
+
+      <div *ngIf="normalizationError" class="error-message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ normalizationError }}
+      </div>
       
       <div class="normalization-options">
         <div class="option-group">
@@ -159,15 +183,6 @@
               <option value="zscore">Z-Score Standardization</option>
               <option value="robust">Robust Scaling (résistant aux outliers)</option>
             </select>
-            
-            <div *ngIf="normalizationError" class="error-message">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              {{ normalizationError }}
-            </div>
             
             <div class="method-info" *ngIf="method">
               <div class="info-header">

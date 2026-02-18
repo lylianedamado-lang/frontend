@@ -24,6 +24,18 @@ export class HistoryComponent implements OnInit {
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    const cachedHistory = this.historyService.getCachedHistory();
+    if (cachedHistory.length > 0) {
+      this.history = cachedHistory;
+      this.loading = false;
+    }
+    this.loadHistory();
+  }
+
+  private loadHistory(): void {
+    this.loading = this.history.length === 0;
+    this.errorMessage = '';
+
     this.historyService.getHistory().subscribe({
       next: (res: HistoryResponse) => {
         this.history = res.history || [];
@@ -31,7 +43,9 @@ export class HistoryComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.errorMessage = "Impossible de charger l'historique.";
+        if (this.history.length === 0) {
+          this.errorMessage = "Impossible de charger l'historique.";
+        }
         this.loading = false;
         console.error(err);
       }

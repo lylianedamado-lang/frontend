@@ -22,4 +22,9 @@ export class AppComponent {
       this.router.navigate(['/login']);
     });
   }
+
+  goTo(path: string) {
+    this.router.navigate([path]);
+  }
 }
+

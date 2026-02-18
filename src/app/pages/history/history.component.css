@@ -72,13 +72,13 @@
 }
 
 .history-loading {
-  color: #4361ee;
-  font-weight: 500;
-  background: #ecf2ff;
-  border: 1px solid #bfd2ff;
-  border-radius: 10px;
-  padding: 0.7rem 0.9rem;
-  width: fit-content;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #d7e3ff;
+  border-top-color: #4361ee;
+  border-radius: 50%;
+  animation: history-spin 0.9s linear infinite;
+  margin-bottom: 1rem;
 }
 
 .error {
@@ -110,5 +110,11 @@
 
   .download-btn {
     width: 100%;
+  }
+}
+
+@keyframes history-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
