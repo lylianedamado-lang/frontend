@@ -9,14 +9,14 @@ import { ResultComponent } from './pages/result/result.component';
 
 export const appRoutes: Routes = [
 
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'clean', pathMatch: 'full' },
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 
-  { path: 'clean', component: CleanComponent, canActivate: [authGuard] },
+  { path: 'clean', component: CleanComponent },
   { path: 'history', component: HistoryComponent, canActivate: [authGuard] },
   { path: 'result', component: ResultComponent, canActivate: [authGuard] },
 
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'clean' }
 ];
