@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 1.5rem;
 }
 
 .auth-header {
@@ -12,7 +13,7 @@
 }
 
 .auth-header h1 {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
   background: linear-gradient(135deg, #4361ee, #3a0ca3);
   -webkit-background-clip: text;
@@ -26,19 +27,26 @@
 
 .auth-card {
   background: white;
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 16px;
-  width: 400px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  width: min(420px, 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .auth-card h2 {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.helper-message {
+  text-align: center;
+  color: #5f6b7a;
+  font-size: 0.92rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.1rem;
   display: flex;
   flex-direction: column;
 }
@@ -72,72 +80,48 @@
   transition: 0.3s;
 }
 
-.auth-btn:hover {
+.auth-btn:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
+.auth-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .error-message {
-  color: #ef476f;
+  background: #fdebec;
+  color: #9d1f33;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
 .success-message {
-  color: #06d6a0;
+  background: #e8f8ef;
+  color: #126a45;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
 .auth-footer {
-  margin-top: 1.5rem;
-  text-align: center;
-}
-
-.auth-footer a {
-  color: #4361ee;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.auth-footer {
-  margin-top: 1.5rem;
-  text-align: center;
-}
-
-.secondary-btn {
-  margin-top: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  border: 2px solid var(--primary-color);
-  background: white;
-  color: var(--primary-color);
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s ease;
-}
-
-.secondary-btn:hover {
-  background: var(--primary-color);
-  color: white;
-}
-
-
-.auth-footer {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
   text-align: center;
   font-size: 0.95rem;
 }
 
 .auth-link {
-  color: var(--primary-color);
+  color: #4361ee;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   margin-left: 5px;
-  transition: 0.2s ease;
 }
 
 .auth-link:hover {
   text-decoration: underline;
-  color: var(--secondary-color);
+  color: #3a0ca3;
 }

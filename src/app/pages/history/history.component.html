@@ -1,16 +1,15 @@
 <div class="history-container">
 
   <div class="history-header">
-    <h1>Historique des nettoyages</h1>
-    <p>Liste des fichiers que vous avez traités</p>
-  </div>
-
-  <div *ngIf="loading" class="loading">
-    Chargement...
+    <h1>Historique de vos nettoyages effectués</h1>
+    <p>La liste des fichiers que vous avez traités sera affichée ici</p>
   </div>
 
   <div *ngIf="errorMessage" class="error">
     {{ errorMessage }}
+  </div>
+  <div *ngIf="downloadError" class="error">
+    {{ downloadError }}
   </div>
 
   <div *ngIf="!loading && history.length === 0" class="empty">
@@ -25,6 +24,17 @@
       <div class="file-date">
         Nettoyé le : {{ formatDate(item.cleaned_at) }}
       </div>
+      <button
+        type="button"
+        class="download-btn"
+        (click)="download(item)"
+        [disabled]="!isDownloadAvailable(item) || downloadingFile === getItemKey(item)">
+        {{
+          downloadingFile === getItemKey(item)
+            ? 'Téléchargement...'
+            : (isDownloadAvailable(item) ? 'Retélécharger' : 'Indisponible')
+        }}
+      </button>
     </div>
   </div>
 

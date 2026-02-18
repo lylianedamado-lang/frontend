@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { CleanResponse, StatsMap } from '../../services/clean.service';
 
 @Component({
   selector: 'app-result',
@@ -12,8 +13,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./result.component.css']
 })
 export class ResultComponent implements OnInit {
-  result: any;
-  statsAvant: any = null;
+  result: CleanResponse | null = null;
+  statsAvant: StatsMap | null = null;
 
   constructor(private router: Router, private http: HttpClient) {}
 
@@ -21,8 +22,8 @@ export class ResultComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const resultData = sessionStorage.getItem('cleanResult');
     const statsData = sessionStorage.getItem('statsAvant');
-    if (resultData) this.result = JSON.parse(resultData);
-    if (statsData) this.statsAvant = JSON.parse(statsData);
+    if (resultData) this.result = JSON.parse(resultData) as CleanResponse;
+    if (statsData) this.statsAvant = JSON.parse(statsData) as StatsMap;
   }
 
   getKeys(): string[] {
@@ -48,8 +49,9 @@ export class ResultComponent implements OnInit {
     const improvement = decreaseIsBetter.includes(key)
       ? ((before - after) / before) * 100
       : ((after - before) / before) * 100;
-    const rounded = Math.round(Math.abs(improvement) * 10) / 10;
-    return rounded === 0 ? '0.0%' : `+${rounded.toFixed(1)}%`;
+    const rounded = Math.round(improvement * 10) / 10;
+    if (rounded === 0) return '0.0%';
+    return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}%`;
   }
 
   isImprovement(key: string): boolean {
@@ -68,7 +70,9 @@ export class ResultComponent implements OnInit {
 download() {
   if (!this.result?.download_url) return;
 
-  const url = environment.apiUrl + this.result.download_url;
+  const result = this.result;
+  const url = environment.apiUrl + result.download_url;
+  const filename = result.fichier_sortie || 'fichier_nettoye';
 
   this.http.get(url, {
     responseType: 'blob',
@@ -78,7 +82,7 @@ download() {
       const a = document.createElement('a');
       const objectUrl = URL.createObjectURL(blob);
       a.href = objectUrl;
-      a.download = this.result.fichier_sortie || 'fichier_nettoye';
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(objectUrl);
     },

@@ -87,17 +87,19 @@
 
           <div class="info-item" *ngIf="result?.method">
             <span class="info-label">Normalisation</span>
-            <span class="info-value">{{ result.method }}</span>
+            <span class="info-value">{{ result?.method }}</span>
           </div>
 
           <div class="info-item">
             <span class="info-label">Statut</span>
-            <span class="info-value status-ready">Prêt au téléchargement</span>
+            <span class="info-value status-ready">
+              {{ result?.download_url ? 'Prêt au téléchargement' : 'Fichier indisponible' }}
+            </span>
           </div>
 
         </div>
 
-        <button class="download-btn" (click)="download()">
+        <button class="download-btn" (click)="download()" [disabled]="!result?.download_url">
           Télécharger le fichier nettoyé
         </button>
 

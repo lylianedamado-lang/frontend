@@ -3,6 +3,10 @@
     <h1>Plateforme de nettoyage de données</h1>
   </div>
 
+  <div *ngIf="pageMessage" class="page-message" [ngClass]="pageMessageType">
+    {{ pageMessage }}
+  </div>
+
   <div class="about-api-section">
     <div class="about-api-card">
       <div class="about-header">
@@ -150,7 +154,7 @@
           <div class="option-label">Méthode de normalisation :</div>
           <div class="method-options">
             <select [(ngModel)]="method" class="method-select" (change)="onMethodChange()">
-              <option value="" disabled selected>Choisir une méthode</option>
+              <option value="" disabled>Choisir une méthode</option>
               <option value="minmax">Min-Max Scaling (0 à 1)</option>
               <option value="zscore">Z-Score Standardization</option>
               <option value="robust">Robust Scaling (résistant aux outliers)</option>
@@ -185,8 +189,8 @@
       </div>
       
       <div class="action-section">
-        <button class="result-btn" (click)="applyNormalization()">
-          <span>Voir les résultats du nettoyage</span>
+        <button class="result-btn" (click)="applyNormalization()" [disabled]="isCleaning">
+          <span>{{ isCleaning ? 'Nettoyage en cours...' : 'Voir les résultats du nettoyage' }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14"/>
             <path d="m12 5 7 7-7 7"/>

@@ -1007,3 +1007,34 @@
     height: 16px;
   }
 }
+
+.page-message {
+  border-radius: var(--border-radius-sm);
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.page-message.info {
+  background: #e8f1ff;
+  border-color: #bfd7ff;
+  color: #1d4f91;
+}
+
+.page-message.success {
+  background: #e7f8f2;
+  border-color: #a7e6cf;
+  color: #0c5e45;
+}
+
+.page-message.error {
+  background: #fdecec;
+  border-color: #f7b7b7;
+  color: #8d1f1f;
+}
+
+.result-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
