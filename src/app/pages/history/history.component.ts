@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs';
 
 import { HistoryItem, HistoryResponse, HistoryService } from '../../services/history.service';
 
@@ -20,7 +21,6 @@ export class HistoryComponent implements OnInit {
   downloadingFile = '';
 
   constructor(private historyService: HistoryService) {}
-
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -57,26 +57,34 @@ export class HistoryComponent implements OnInit {
   download(item: HistoryItem): void {
     const resolvedUrl = this.resolveDownloadUrl(item);
     if (!resolvedUrl) {
-      this.downloadError = 'Ce fichier ne peut pas être retéléchargé pour le moment.';
+      this.downloadError = 'Ce fichier ne peut pas etre retelecharge pour le moment.';
       return;
     }
 
     this.downloadError = '';
     this.downloadingFile = this.getItemKey(item);
 
-    this.historyService.downloadFromHistory(resolvedUrl).subscribe({
-      next: (blob) => {
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = objectUrl;
-        a.download = item.cleaned_filename || item.fichier_sortie || item.original_filename || 'fichier_nettoye';
-        a.click();
-        URL.revokeObjectURL(objectUrl);
+    this.historyService.downloadFromHistory(resolvedUrl).pipe(
+      finalize(() => {
         this.downloadingFile = '';
+      })
+    ).subscribe({
+      next: (blob) => {
+        try {
+          const objectUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = objectUrl;
+          a.download = item.cleaned_filename || item.fichier_sortie || item.original_filename || 'fichier_nettoye';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        } catch {
+          this.downloadError = 'Telechargement impossible. Veuillez reessayer.';
+        }
       },
       error: (_err: HttpErrorResponse) => {
-        this.downloadError = 'Téléchargement impossible. Veuillez réessayer.';
-        this.downloadingFile = '';
+        this.downloadError = 'Telechargement impossible. Veuillez reessayer.';
       }
     });
   }
