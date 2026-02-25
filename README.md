@@ -39,6 +39,14 @@ export const environment = {
 };
 ```
 
+Vous pouvez aussi surcharger l'URL API a l'execution avec `window.__env.apiUrl` (utile en deploy) :
+
+```html
+<script>
+  window.__env = { apiUrl: "https://votre-api.onrender.com" };
+</script>
+```
+
 ## Lancement
 
 ```bash
