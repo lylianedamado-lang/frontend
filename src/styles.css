@@ -1,0 +1,21 @@
+/* TIDY - Global Styles */
+
+:root {
+  --violet: #7c3aed;
+  --violet-light: #a855f7;
+  --violet-dark: #2d1b69;
+  --bg: #faf8ff;
+}
+
+body {
+  font-family: 'Bell MT', Georgia, 'Times New Roman', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+
+.card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.alert { border: none; font-size: 0.9rem; }
+.badge { font-weight: 500; }

@@ -1,0 +1,18 @@
+.app-footer {
+  margin: 1.25rem 1rem 1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 55%, #a855f7 100%);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(76, 29, 149, 0.28);
+}
+
+.footer-note {
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.emoji {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+}

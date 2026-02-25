@@ -1,0 +1,26 @@
+.nav-tidy {
+  background: linear-gradient(135deg, #2d1b69 0%, #4a2d8a 50%, #6b3fa0 100%);
+}
+.brand-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #fff;
+}
+.brand-text {
+  font-size: 1.4rem; font-weight: 800; letter-spacing: 3px; color: #fff;
+}
+.nav-tidy .nav-link { 
+  color: rgba(255,255,255,0.8); 
+  font-weight: 500; 
+  transition: color 0.2s; }
+
+.nav-tidy .nav-link:hover { 
+  color: #fff; }
+  
+.nav-tidy .nav-link.active { color: #e9d5ff !important; font-weight: 700; }
+.btn-cta {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: #fff; border: none; font-weight: 600;
+}
+.btn-cta:hover { background: linear-gradient(135deg, #9333ea, #6d28d9); color: #fff; }

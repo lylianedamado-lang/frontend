@@ -1,0 +1,261 @@
+<div class="page-wrapper">
+  <!-- Hero Section -->
+  <section class="hero-section text-white py-5">
+    <div class="container hero-content">
+      <h1 class="fw-bold display-5 mb-3">Bienvenue sur <span class="text-glow">TIDY</span></h1>
+      <p class="lead mb-2 opacity-90">
+        TIDY est une API intelligente de nettoyage de données.
+      </p>
+      <p class="desc-text">
+        Chargez vos fichiers <strong>CSV, Excel, JSON ou XML</strong> et TIDY se charge de tout :
+        suppression des doublons, traitement des valeurs manquantes, détection des valeurs aberrantes,
+        normalisation du texte et normalisation numérique. Récupérez un fichier propre, prêt à être analysé.
+      </p>
+    </div>
+  </section>
+
+  <div class="container py-5">
+    <!-- Upload Zone -->
+    <div class="row justify-content-center mb-4">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow rounded-4 overflow-hidden">
+          <div class="card-header-violet p-3 text-center">
+            <h5 class="fw-bold text-white mb-0"><i class="bi bi-cloud-arrow-up me-2"></i>Charger votre fichier</h5>
+          </div>
+          <div class="card-body p-4">
+            <div class="alert alert-danger rounded-3 d-flex align-items-center" *ngIf="errorMessage">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+            </div>
+
+            <div class="drop-zone text-center p-5 rounded-4"
+                 [class.drag-over]="dragOver" [class.has-file]="state.hasFile"
+                 (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+                 (drop)="onDrop($event)" (click)="fileInput.click()">
+              <input type="file" #fileInput class="d-none" accept=".csv,.xlsx,.xls,.json,.xml"
+                     (change)="onFileSelected($event)">
+
+              <div *ngIf="!state.hasFile">
+                <div class="upload-icon-big mb-3"><i class="bi bi-cloud-upload"></i></div>
+                <p class="fw-semibold fs-5 mb-1">Glissez votre fichier ici</p>
+                <p class="text-muted mb-3">ou cliquez pour parcourir</p>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                  <span class="badge badge-format">CSV</span>
+                  <span class="badge badge-format">Excel</span>
+                  <span class="badge badge-format">JSON</span>
+                  <span class="badge badge-format">XML</span>
+                </div>
+              </div>
+
+              <div *ngIf="state.hasFile" class="text-center">
+                <div class="file-ok-icon mb-2"><i class="bi bi-file-earmark-check-fill"></i></div>
+                <p class="fw-bold fs-5 mb-0">{{ fileName }}</p>
+                <p class="text-muted small mb-3">{{ fileSize }}</p>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                        (click)="removeFile(); $event.stopPropagation()">
+                  <i class="bi bi-trash me-1"></i> Retirer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div *ngIf="state.hasFile" class="row justify-content-center mb-4 fade-in">
+      <div class="col-lg-11">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="card-header-violet p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <h5 class="fw-bold text-white mb-0">
+              <i class="bi bi-eye me-2"></i>Aperçu du contenu de votre fichier
+            </h5>
+            <div *ngIf="state.filePreviewData.length > 0" class="d-flex gap-2">
+              <span class="badge bg-white text-violet">
+                <i class="bi bi-rows me-1"></i>{{ state.fileTotalRows }} lignes au total
+              </span>
+              <span class="badge bg-white text-violet">
+                <i class="bi bi-layout-three-columns me-1"></i>{{ state.fileColumns.length }} colonnes
+              </span>
+            </div>
+          </div>
+          <div class="card-body p-4">
+            <div *ngIf="previewNotice" class="alert alert-info rounded-3 d-flex align-items-start mb-3">
+              <i class="bi bi-info-circle-fill me-2 mt-1"></i>{{ previewNotice }}
+            </div>
+
+            <div *ngIf="previewLoading" class="text-center py-4">
+              <div class="spinner-border text-violet"></div>
+              <p class="text-muted mt-2 small">Lecture du fichier en cours...</p>
+            </div>
+
+            <div *ngIf="!previewLoading && state.filePreviewData.length > 0">
+              <p class="text-muted small mb-3">
+                Voici un aperçu du contenu de votre fichier. Les cellules <span class="text-danger fw-semibold">(vide)</span> indiquent des valeurs manquantes.
+              </p>
+
+              <h6 class="fw-bold text-violet mb-2" *ngIf="state.fileLastRows.length === 0">
+                <i class="bi bi-list-check me-1"></i> Toutes les lignes ({{ state.filePreviewData.length }})
+              </h6>
+              <h6 class="fw-bold text-violet mb-2" *ngIf="state.fileLastRows.length > 0">
+                <i class="bi bi-arrow-up-circle me-1"></i> 20 premières lignes
+              </h6>
+              <div class="table-responsive preview-table-wrap mb-4">
+                <table class="table table-sm table-hover table-bordered mb-0">
+                  <thead class="thead-violet">
+                    <tr>
+                      <th class="small">#</th>
+                      <th *ngFor="let col of state.fileColumns" class="small">{{ col }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of state.filePreviewData; let i = index">
+                      <td class="text-muted small">{{ i + 1 }}</td>
+                      <td *ngFor="let col of state.fileColumns" class="small">
+                        <span [class.text-danger]="isMissing(row[col])"
+                              [class.fst-italic]="isMissing(row[col])"
+                              [class.fw-semibold]="isMissing(row[col])">
+                          {{ isMissing(row[col]) ? '(vide)' : displayPreviewValue(row[col]) }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Séparateur -->
+              <div *ngIf="state.fileLastRows.length > 0" class="separator-dots text-center my-3">
+                <span class="text-muted">&#8942; &#8942; &#8942;</span>
+                <p class="text-muted small mb-0">{{ state.fileTotalRows - 40 > 0 ? (state.fileTotalRows - 40) + ' lignes masquées' : '' }}</p>
+              </div>
+
+              <!-- 20 dernières lignes -->
+              <div *ngIf="state.fileLastRows.length > 0">
+                <h6 class="fw-bold text-violet mb-2"><i class="bi bi-arrow-down-circle me-1"></i> 20 dernières lignes</h6>
+                <div class="table-responsive preview-table-wrap">
+                  <table class="table table-sm table-hover table-bordered mb-0">
+                    <thead class="thead-violet">
+                      <tr>
+                        <th class="small">#</th>
+                        <th *ngFor="let col of state.fileColumns" class="small">{{ col }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let row of state.fileLastRows; let i = index">
+                        <td class="text-muted small">{{ state.fileTotalRows - state.fileLastRows.length + i + 1 }}</td>
+                        <td *ngFor="let col of state.fileColumns" class="small">
+                          <span [class.text-danger]="isMissing(row[col])"
+                                [class.fst-italic]="isMissing(row[col])"
+                                [class.fw-semibold]="isMissing(row[col])">
+                            {{ isMissing(row[col]) ? '(vide)' : displayPreviewValue(row[col]) }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="!previewLoading && state.filePreviewData.length === 0 && state.hasFile" class="text-center py-4">
+              <i class="bi bi-file-earmark-spreadsheet fs-1 text-violet d-block mb-2"></i>
+              <h6 class="fw-bold">Aperçu non disponible pour ce format</h6>
+              <p class="text-muted small mb-0">Les fichiers Excel et XML ne peuvent pas être prévisualisés directement dans le navigateur. Le contenu sera visible dans les résultats après nettoyage.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Normalisation Section -->
+    <div *ngIf="state.hasFile" class="row justify-content-center mb-4 fade-in">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">
+              <i class="bi bi-sliders text-violet me-2"></i>
+              Souhaitez-vous normaliser vos données numériques ?
+            </h5>
+
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <div class="choice-card text-center p-4 rounded-4"
+                     [class.choice-yes]="normalizeChoice === 'yes'"
+                     (click)="selectNormalize('yes')">
+                  <i class="bi bi-check-circle-fill fs-2 d-block mb-2"></i>
+                  <span class="fw-bold">Oui, normaliser</span>
+                  <p class="small text-muted mb-0 mt-1">Appliquer une normalisation numérique</p>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="choice-card text-center p-4 rounded-4"
+                     [class.choice-no]="normalizeChoice === 'no'"
+                     (click)="selectNormalize('no')">
+                  <i class="bi bi-dash-circle-fill fs-2 d-block mb-2"></i>
+                  <span class="fw-bold">Non, garder les données brutes</span>
+                  <p class="small text-muted mb-0 mt-1">Nettoyage sans normalisation</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Si OUI → méthodes -->
+            <div *ngIf="normalizeChoice === 'yes'" class="mt-4 fade-in">
+              <h6 class="fw-bold mb-3">Choisissez une méthode de normalisation :</h6>
+              <div class="d-flex flex-column gap-2">
+                <div *ngFor="let m of normalizationMethods" class="method-card p-3 rounded-3 d-flex align-items-center gap-3"
+                   [class.method-active]="method === m.value"
+                   (click)="selectMethod(m.value)">
+                  <div class="method-radio">
+                    <div class="method-dot" *ngIf="method === m.value"></div>
+                  </div>
+                  <div>
+                    <span class="fw-bold">{{ m.label }}</span>
+                    <p class="text-muted small mb-0">{{ m.desc }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="selectedMethodInfo" class="alert alert-primary border-0 rounded-3 mt-3 mb-0">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>{{ selectedMethodInfo.label }} :</strong>
+                {{ selectedMethodInfo.impact }}
+              </div>
+
+              <div *ngIf="methodError" class="alert alert-warning rounded-3 mt-3 d-flex align-items-center">
+                <i class="bi bi-exclamation-circle-fill me-2 fs-5 text-warning"></i>
+                <span><strong>Attention !</strong> Vous devez choisir une méthode de normalisation avant de continuer.</span>
+              </div>
+            </div>
+
+            <!-- Si NON → message -->
+            <div *ngIf="normalizeChoice === 'no'" class="mt-3 fade-in">
+              <div class="alert alert-info rounded-3 d-flex align-items-center mb-0">
+                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                <span>Les données seront nettoyées sans normalisation. Les résultats du nettoyage seront disponibles sur la page <strong>Résultats</strong>.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clean Error -->
+    <div *ngIf="cleanError" class="row justify-content-center mb-3">
+      <div class="col-lg-8">
+        <div class="alert alert-danger rounded-4 d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ cleanError }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <div *ngIf="state.hasFile && normalizeChoice !== null" class="text-center mb-5 fade-in">
+      <button class="btn btn-violet btn-lg rounded-pill px-5 shadow"
+              (click)="goToResults()"
+              [disabled]="cleanLoading">
+        <span *ngIf="cleanLoading" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!cleanLoading" class="bi bi-arrow-right-circle me-2"></i>
+        {{ cleanLoading ? 'Nettoyage en cours...' : 'Aller sur la page Résultats' }}
+      </button>
+    </div>
+  </div>
+</div>

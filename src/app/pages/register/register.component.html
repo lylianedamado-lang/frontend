@@ -1,0 +1,50 @@
+<div class="auth-page d-flex align-items-center justify-content-center min-vh-100">
+  <div class="auth-card card border-0 shadow-lg">
+    <div class="card-body p-5">
+      <div class="text-center mb-4">
+        <div class="auth-icon mb-3"><i class="bi bi-person-plus-fill"></i></div>
+        <h2 class="fw-bold text-dark">Créer un compte TIDY</h2>
+        <p class="text-muted">Inscrivez-vous pour commencer</p>
+      </div>
+
+      <div class="alert alert-danger rounded-3" *ngIf="errorMessage"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}</div>
+      <div class="alert alert-success rounded-3" *ngIf="successMessage"><i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}</div>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-person me-1"></i> Nom d'utilisateur</label>
+          <input type="text" class="form-control form-control-lg input-custom" [(ngModel)]="username" name="username" required placeholder="alpha">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-envelope me-1"></i> Email</label>
+          <input type="email" class="form-control form-control-lg input-custom" [(ngModel)]="email" name="email" required placeholder="alpha@example.com">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold"><i class="bi bi-lock me-1"></i> Mot de passe</label>
+          <input type="password" class="form-control form-control-lg input-custom" [(ngModel)]="password" name="password" required placeholder="Motdepasse1"
+                 [class.is-invalid]="password.length > 0 && passwordErrors.length > 0"
+                 [class.is-valid]="password.length > 0 && passwordErrors.length === 0">
+          <div class="mt-2" *ngIf="password.length > 0">
+            <small *ngFor="let err of passwordErrors" class="d-block text-danger"><i class="bi bi-x-circle me-1"></i>{{ err }}</small>
+            <small *ngIf="passwordErrors.length === 0" class="text-success"><i class="bi bi-check-circle me-1"></i> Mot de passe valide</small>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold"><i class="bi bi-lock-fill me-1"></i> Confirmer</label>
+          <input type="password" class="form-control form-control-lg input-custom" [(ngModel)]="confirmPassword" name="confirmPassword" required placeholder="••••••••"
+                 [class.is-invalid]="confirmPassword.length > 0 && password !== confirmPassword"
+                 [class.is-valid]="confirmPassword.length > 0 && password === confirmPassword">
+          <div class="invalid-feedback">Les mots de passe ne correspondent pas</div>
+        </div>
+        <button type="submit" class="btn btn-violet btn-lg w-100 mb-3" [disabled]="loading || !isFormValid">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ loading ? 'Inscription...' : 'S\'inscrire' }}
+        </button>
+      </form>
+      <div class="text-center mt-3">
+        <span class="text-muted">Déjà un compte ?</span>
+        <a routerLink="/login" class="ms-1 fw-semibold text-decoration-none link-violet">Se connecter</a>
+      </div>
+    </div>
+  </div>
+</div>
