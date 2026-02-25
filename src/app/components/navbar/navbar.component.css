@@ -1,26 +1,65 @@
 .nav-tidy {
-  background: linear-gradient(135deg, #2d1b69 0%, #4a2d8a 50%, #6b3fa0 100%);
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
 }
-.brand-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: linear-gradient(135deg, #a855f7, #7c3aed);
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 18px; color: #fff;
-}
-.brand-text {
-  font-size: 1.4rem; font-weight: 800; letter-spacing: 3px; color: #fff;
-}
-.nav-tidy .nav-link { 
-  color: rgba(255,255,255,0.8); 
-  font-weight: 500; 
-  transition: color 0.2s; }
 
-.nav-tidy .nav-link:hover { 
-  color: #fff; }
-  
-.nav-tidy .nav-link.active { color: #e9d5ff !important; font-weight: 700; }
-.btn-cta {
-  background: linear-gradient(135deg, #a855f7, #7c3aed);
-  color: #fff; border: none; font-weight: 600;
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
 }
-.btn-cta:hover { background: linear-gradient(135deg, #9333ea, #6d28d9); color: #fff; }
+
+.brand-text {
+  color: var(--text-main);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.nav-tidy .nav-link {
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-tidy .nav-link:hover {
+  color: var(--primary);
+}
+
+.nav-tidy .nav-link.active {
+  color: var(--primary) !important;
+  border-color: var(--primary);
+}
+
+.nav-tidy .navbar-toggler i {
+  color: var(--text-main) !important;
+}
+
+.btn-cta {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-cta:hover {
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
+  color: #ffffff;
+}
+
+.nav-tidy .btn-outline-light {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.nav-tidy .btn-outline-light:hover {
+  background: var(--primary-soft);
+}

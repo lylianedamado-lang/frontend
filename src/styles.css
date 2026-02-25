@@ -1,21 +1,58 @@
-/* TIDY - Global Styles */
-
 :root {
-  --violet: #7c3aed;
-  --violet-light: #a855f7;
-  --violet-dark: #2d1b69;
-  --bg: #faf8ff;
+  --bg-page: #f3f5f7;
+  --bg-surface: #ffffff;
+  --bg-muted: #eef2f6;
+  --text-main: #1f2937;
+  --text-muted: #5b6472;
+  --border: #d8dee6;
+  --primary: #1f4e79;
+  --primary-strong: #173a5c;
+  --primary-soft: #e9f0f7;
+  --success-soft: #edf7f0;
+  --success-text: #25613a;
+  --danger-soft: #fdeeee;
+  --danger-text: #8f1d1d;
+  --shadow-sm: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family: 'Bell MT', Georgia, 'Times New Roman', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
-  background: var(--bg);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 3px; }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-.card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.alert { border: none; font-size: 0.9rem; }
-.badge { font-weight: 500; }
+::-webkit-scrollbar-thumb {
+  background: #b8c1cc;
+  border-radius: 8px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.alert {
+  border: 1px solid var(--border);
+}
+
+.badge {
+  font-weight: 600;
+}

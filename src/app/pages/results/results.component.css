@@ -1,61 +1,132 @@
-.page-wrapper { min-height: calc(100vh - 56px); background: #faf8ff; }
-.rounded-4 { border-radius: 16px !important; }
-.text-violet { color: #7c3aed; }
+.page-wrapper {
+  min-height: calc(100vh - 56px);
+  background: var(--bg-page);
+}
 
-/* Recap table */
-.card-header-recap { background: linear-gradient(135deg, #7c3aed, #a855f7); border-radius: 16px 16px 0 0; }
+.rounded-4 {
+  border-radius: 14px !important;
+}
+
+.text-violet {
+  color: var(--primary) !important;
+}
+
+.card-header-recap,
+.card-header-cleaned {
+  background: #f7f9fb;
+  border-bottom: 1px solid var(--border);
+  border-radius: 14px 14px 0 0;
+}
+
+.card-header-recap h5,
+.card-header-cleaned h5,
+.card-header-recap .text-white,
+.card-header-cleaned .text-white {
+  color: var(--text-main) !important;
+}
 
 .recap-table thead th {
-  background: #f5f3ff; border-bottom: 2px solid #e9ecef;
-  font-weight: 700; font-size: 0.9rem; padding: 14px 12px;
+  background: #f2f5f8;
+  border-bottom: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 14px 12px;
   white-space: nowrap;
 }
-.col-before { color: #ef476f; }
-.col-after { color: #7c3aed; }
-.col-diff { color: #6b7280; }
 
-.recap-table tbody td { padding: 12px; vertical-align: middle; border-bottom: 1px solid #f3f0ff; }
-.recap-table tbody tr:hover { background: #faf8ff; }
+.col-before,
+.col-after,
+.col-diff {
+  color: var(--text-muted);
+}
 
-.section-row td { background: #f5f3ff !important; padding-top: 14px !important; border-bottom: none !important; }
-.sub-row td:first-child { font-size: 0.88rem; }
+.recap-table tbody td {
+  padding: 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #edf1f5;
+}
 
-/* Buttons */
+.recap-table tbody tr:hover {
+  background: #fafbfd;
+}
+
+.section-row td {
+  background: #f8fafc !important;
+  padding-top: 14px !important;
+  border-bottom: none !important;
+}
+
+.sub-row td:first-child {
+  font-size: 0.88rem;
+}
+
 .btn-violet {
-  background: linear-gradient(135deg, #a855f7, #7c3aed); border: none;
-  color: #fff; font-weight: 600;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: #ffffff;
+  font-weight: 600;
 }
+
 .btn-violet:hover:not(:disabled) {
-  transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.35); color: #fff;
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
+  color: #ffffff;
 }
-.btn-violet:disabled { opacity: 0.5; color: #fff; }
 
-canvas { max-height: 250px; }
-.chart-note { line-height: 1.45; }
-
-/* Cleaned file preview */
-.card-header-cleaned {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  border-radius: 16px 16px 0 0;
+.btn-violet:disabled {
+  opacity: 0.65;
 }
-.text-success-dark { color: #166534 !important; }
 
-.cleaned-table-wrap {
-  max-height: 400px; overflow: auto;
-  border: 1px solid #dcfce7; border-radius: 8px;
+canvas {
+  max-height: 250px;
 }
+
+.chart-note {
+  line-height: 1.45;
+}
+
+.text-success-dark {
+  color: var(--success-text) !important;
+}
+
+.cleaned-table-wrap,
+.preview-table-wrap {
+  max-height: 400px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
 .thead-cleaned {
-  position: sticky; top: 0; z-index: 10;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
+
 .thead-cleaned th {
-  background: #f0fdf4 !important; color: #166534;
-  font-weight: 700; white-space: nowrap; border-bottom: 2px solid #bbf7d0;
+  background: #f2f5f8 !important;
+  color: var(--text-main);
+  font-weight: 700;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
 }
-.cleaned-table-wrap .table td { white-space: nowrap; }
 
-.separator-dots { letter-spacing: 8px; font-size: 1.3rem; }
+.cleaned-table-wrap .table td {
+  white-space: nowrap;
+}
 
-/* Ready banner */
+.separator-dots {
+  letter-spacing: 6px;
+  font-size: 1.1rem;
+}
+
 .ready-banner {
-  background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff;
+  background: #ffffff;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+
+.ready-banner .opacity-75 {
+  opacity: 1 !important;
+  color: var(--text-muted);
 }
