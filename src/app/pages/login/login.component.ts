@@ -22,7 +22,8 @@ export class LoginComponent {
   onSubmit() {
     this.errorMessage = '';
     this.loading = true;
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
+    const email = this.email.trim().toLowerCase();
+    this.auth.login({ email, password: this.password }).subscribe({
       next: () => { this.loading = false; this.router.navigate(['/accueil']); },
       error: (err) => { this.loading = false; this.errorMessage = err.error?.error || err.error?.message || 'Erreur de connexion.'; }
     });

@@ -32,8 +32,23 @@ export class AuthService {
   }
 
   login(data: LoginRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, data, { withCredentials: true }).pipe(
-      switchMap(() => this.checkAuth(true))
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, data, { withCredentials: true }).pipe(
+      switchMap((res) => {
+        const loginUser = this.extractUserFromResponse(res);
+        if (loginUser) {
+          this.currentUserSubject.next(loginUser);
+        }
+
+        return this.checkAuth(true).pipe(
+          map((checkedUser) => checkedUser ?? loginUser),
+          catchError((error) => {
+            if (loginUser) {
+              return of(loginUser);
+            }
+            return throwError(() => error);
+          })
+        );
+      })
     );
   }
 
@@ -77,5 +92,18 @@ export class AuthService {
 
   private isAuthMissing(error: unknown): boolean {
     return error instanceof HttpErrorResponse && [401, 403, 404].includes(error.status);
+  }
+
+  private extractUserFromResponse(response: any): User | null {
+    const user = response?.user ?? response;
+    if (!user || typeof user !== 'object') {
+      return null;
+    }
+
+    if (typeof user.email === 'string' && typeof user.username === 'string') {
+      return user as User;
+    }
+
+    return null;
   }
 }

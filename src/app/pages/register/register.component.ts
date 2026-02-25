@@ -29,7 +29,7 @@ export class RegisterComponent {
   }
 
   get isFormValid(): boolean {
-    return this.username.length > 0 && this.email.length > 0
+    return this.username.trim().length > 0 && this.email.trim().length > 0
       && this.password.length >= 8 && this.passwordErrors.length === 0
       && this.password === this.confirmPassword;
   }
@@ -37,7 +37,9 @@ export class RegisterComponent {
   onSubmit() {
     if (!this.isFormValid) return;
     this.errorMessage = ''; this.loading = true;
-    this.auth.register({ username: this.username, email: this.email, password: this.password }).subscribe({
+    const username = this.username.trim();
+    const email = this.email.trim().toLowerCase();
+    this.auth.register({ username, email, password: this.password }).subscribe({
       next: () => {
         this.loading = false;
         this.successMessage = 'Compte créé avec succès ! Redirection...';
