@@ -4,27 +4,28 @@
 
 .auth-card {
   width: 100%;
-  max-width: 480px;
+  max-width: 430px;
   border-radius: 16px;
   border: 1px solid var(--border);
 }
 
 .auth-icon {
-  width: 62px;
-  height: 62px;
-  border-radius: 12px;
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
   background: var(--primary-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 22px;
   color: var(--primary);
 }
 
 .input-custom {
   border-radius: 10px;
   border: 1px solid var(--border);
-  padding: 12px 14px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
 }
 
 .input-custom:focus {
@@ -38,6 +39,8 @@
   border-radius: 10px;
   color: #ffffff;
   font-weight: 600;
+  padding: 10px 14px;
+  font-size: 0.95rem;
 }
 
 .btn-violet:hover {
@@ -52,4 +55,12 @@
 
 .link-violet:hover {
   color: var(--primary-strong);
+}
+
+.auth-page .card-body {
+  padding: 1.5rem !important;
+}
+
+.auth-page h2 {
+  font-size: 1.45rem;
 }
